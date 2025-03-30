@@ -40,12 +40,12 @@ function InterviewQuestions({ mockInterviewQuestion, activeQuestionIndex, setAct
       }
 
 
-    
+
       const speech = new SpeechSynthesisUtterance(text);
-     
+
       // speech.lang = voice[7].lang;
 
-     
+
       setSpeechInstance(speech);
       speech.onend = () => setIsSpeaking(false);
       window.speechSynthesis.speak(speech);
@@ -117,12 +117,12 @@ function InterviewQuestions({ mockInterviewQuestion, activeQuestionIndex, setAct
             </div>
           </div>
           <h3 className='text-xl font-semibold text-gray-800'>{currentInterviewer.name}</h3>
-          <p className={`text-sm ${isSpeaking && !isPaused ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>                                      
+          <p className={`text-sm ${isSpeaking && !isPaused ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
             {isSpeaking && !isPaused ? "Speaking..." : "Your Interviewer"}
           </p>
         </div>
 
-       
+
 
         {/* Speech Controls */}
         <div className='flex justify-center gap-4 items-center mb-8'>
