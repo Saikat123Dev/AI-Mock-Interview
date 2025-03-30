@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     console.log("userAnswer", userAnswer);
     console.log("mockInterviewId", mockInterviewId);
     console.log("question", question);
-    
+
     // Validate request body
     if (!question || !feedback?.rating || !feedback?.feedback ||!feedback.correctAnswer|| !userAnswer || !mockInterviewId) {
       return NextResponse.json({ error: 'Missing or invalid fields in request.' }, { status: 400 });
@@ -53,14 +53,6 @@ export async function POST(request: NextRequest) {
           overallPresentation:feedback?.videoAnalysis.overallPresentation,
           improvementSuggestions:feedback?.videoAnalysis.improvementSuggestions,
           videoUrl,
-          
-
-
-
-
-
-
-          
           userAnswer,
           correctAnswer: answer,
 

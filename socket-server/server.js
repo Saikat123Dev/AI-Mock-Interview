@@ -6,7 +6,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://ai-mock-interview-ten-omega.vercel.app/',
+  origin: process.env.FRONTEND_URL || 'https://hackathon-2xo7.vercel.app/',
   methods: ['GET', 'POST'],
   credentials: true
 }));

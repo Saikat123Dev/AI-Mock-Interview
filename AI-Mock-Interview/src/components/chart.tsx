@@ -131,82 +131,82 @@ const RatingsChart = ({userId}) => {
   }, [selectedPosition, originalData]);
 
   // Updated chart options with modern styling
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: false,
-      },
-      tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.9)",
-        titleFont: {
-          size: 14,
-          weight: 'bold'
-        },
-        bodyFont: { size: 12 },
-        padding: 12,
-        cornerRadius: 8,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 5,
-        grid: {
-          color: "rgba(6, 182, 212, 0.1)",  // Soft cyan grid lines
-          drawBorder: false,
-        },
-        border: {
-          display: false,
-        },
-        ticks: {
-          color: "rgba(6, 182, 212, 0.7)",
-          font: {
-            size: 10,
-          },
-          padding: 10,
-        }
-      },
-      x: {
-        grid: {
-          display: false,
-        },
-        border: {
-          display: false,
-        },
-        ticks: {
-          color: "rgba(6, 182, 212, 0.7)",
-          font: {
-            size: 10,
-          },
-          padding: 10,
-          maxRotation: 0,
-          autoSkip: true,
-          autoSkipPadding: 20,
-        }
-      },
-    },
-    layout: {
-      padding: {
-        left: 10,
-        right: 10,
-        top: 10,
-        bottom: 10
-      }
-    },
-    animation: {
-      duration: 1200,
-      easing: 'easeOutQuart'
-    },
-    hover: {
-      mode: 'nearest',
-      intersect: true
-    }
-  };
+  // const options = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     legend: {
+  //       display: false,
+  //     },
+  //     title: {
+  //       display: false,
+  //     },
+  //     tooltip: {
+  //       backgroundColor: "rgba(0, 0, 0, 0.9)",
+  //       titleFont: {
+  //         size: 14,
+  //         weight: 'bold'
+  //       },
+  //       bodyFont: { size: 12 },
+  //       padding: 12,
+  //       cornerRadius: 8,
+  //     },
+  //   },
+  //   scales: {
+  //     y: {
+  //       beginAtZero: true,
+  //       max: 5,
+  //       grid: {
+  //         color: "rgba(6, 182, 212, 0.1)",  // Soft cyan grid lines
+  //         drawBorder: false,
+  //       },
+  //       border: {
+  //         display: false,
+  //       },
+  //       ticks: {
+  //         color: "rgba(6, 182, 212, 0.7)",
+  //         font: {
+  //           size: 10,
+  //         },
+  //         padding: 10,
+  //       }
+  //     },
+  //     x: {
+  //       grid: {
+  //         display: false,
+  //       },
+  //       border: {
+  //         display: false,
+  //       },
+  //       ticks: {
+  //         color: "rgba(6, 182, 212, 0.7)",
+  //         font: {
+  //           size: 10,
+  //         },
+  //         padding: 10,
+  //         maxRotation: 0,
+  //         autoSkip: true,
+  //         autoSkipPadding: 20,
+  //       }
+  //     },
+  //   },
+  //   layout: {
+  //     padding: {
+  //       left: 10,
+  //       right: 10,
+  //       top: 10,
+  //       bottom: 10
+  //     }
+  //   },
+  //   animation: {
+  //     duration: 1200,
+  //     easing: 'easeOutQuart'
+  //   },
+  //   hover: {
+  //     mode: 'nearest',
+  //     intersect: true
+  //   }
+  // };
 
   if (loading) return (
     <div className="flex justify-center items-center h-64 bg-[#2c3e50] rounded-2xl">
@@ -253,7 +253,7 @@ const RatingsChart = ({userId}) => {
       {/* Chart Container with Gradient Background */}
       <div className="h-64 relative">
         {chartData ? (
-          <Line data={chartData} options={options} />
+          <Line data={chartData} />
         ) : (
           <div className="text-center text-gray-400">No data available</div>
         )}
