@@ -112,7 +112,7 @@ async function generateInterviewQuestions(
 
     // Use the correct model identifier for Gemini Pro
     // NOTE: Check the latest documentation for the correct model name
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Create prompt for generating interview questions with dynamic time allocation
     const prompt = `Create a set of ${questionNo} technical interview questions for a ${role} position focused on ${skills.join(", ")} with ${difficulty} difficulty level (${experience} years of experience expected).

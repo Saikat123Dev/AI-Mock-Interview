@@ -1,16 +1,16 @@
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
 
-const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyCi52NMqL4FptIf7z5dI7LeAVrnRFs9lx8";
 console.log(apiKey);
 const genAI = new GoogleGenerativeAI(apiKey);
 
 // Create models - one for text-only and one for multimodal
 const textModel = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-2.5-flash",
 });
 
 const visionModel = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash", // Using the same model for both text and vision
+  model: "gemini-2.5-flash", // Using the same model for both text and vision
 });
 
 const generationConfig = {
