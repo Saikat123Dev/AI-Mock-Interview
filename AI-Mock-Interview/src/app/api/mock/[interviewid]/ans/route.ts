@@ -2,90 +2,136 @@ import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { question, answer, feedback, userAnswer, mockInterviewId, videoUrl } = body;
-    console.log("feedback", feedback.correctAnswer);
+
+    const {
+      question,
+      answer,
+      feedback,
+      userAnswer,
+      mockInterviewId,
+      videoUrl,
+    } = body;
+
+    console.log("feedback", feedback);
     console.log("userAnswer", userAnswer);
     console.log("mockInterviewId", mockInterviewId);
     console.log("question", question);
 
-    // Validate request body
-    if (!question || !feedback?.rating || !feedback?.feedback || !feedback.correctAnswer || !userAnswer || !mockInterviewId) {
-      return NextResponse.json({ error: 'Missing or invalid fields in request.' }, { status: 400 });
+    // Validate required fields
+    if (
+      !question ||
+      !feedback ||
+      !userAnswer ||
+      !mockInterviewId
+    ) {
+      return NextResponse.json(
+        {
+          error: "Missing required fields",
+        },
+        { status: 400 }
+      );
     }
 
-    // Get the current user
+    // Get current user
     const user = await currentUser();
-    if (!user || !user.id) {
-      return NextResponse.json({ error: 'User not authenticated.' }, { status: 401 });
+
+    if (!user?.id) {
+      return NextResponse.json(
+        {
+          error: "User not authenticated",
+        },
+        { status: 401 }
+      );
     }
 
     const userId = user.id;
 
+    // Convert rating string ("4/5", "0/5") => number
+    const rating = feedback?.rating
+      ? parseInt(feedback.rating.toString().split("/")[0], 10)
+      : 0;
 
-
-
+    // Check if answer already exists
     const existingAnswer = await db.userAnswer.findFirst({
       where: {
-        mockInterviewId: mockInterviewId,
-        question: question
+        mockInterviewId: mockInterviewId.toString(),
+        question,
+      },
+    });
 
-      }
-    })
+    const answerData = {
+      Intervieweerating: rating,
+      Intervieweefeedback: feedback?.feedback || "",
+
+      voiceTone: feedback?.videoAnalysis?.voiceTone ?? "",
+      bodyLanguage: feedback?.videoAnalysis?.bodyLanguage ?? "",
+      facialExpressions:
+        feedback?.videoAnalysis?.facialExpressions ?? "",
+      confidence: feedback?.videoAnalysis?.confidence ?? "",
+      speakingPace: feedback?.videoAnalysis?.speakingPace ?? "",
+      overallPresentation:
+        feedback?.videoAnalysis?.overallPresentation ?? "",
+      improvementSuggestions:
+        feedback?.videoAnalysis?.improvementSuggestions ?? "",
+
+      videoUrl: videoUrl ?? "",
+
+      userAnswer,
+
+      correctAnswer:
+        feedback?.correctAnswer || answer || "",
+    };
 
     if (existingAnswer) {
-      const updateAnswer = await db.userAnswer.update(
-        {
-          where: {
-            id: existingAnswer.id
-          },
-          data: {
-            Intervieweerating: feedback?.rating,
-            Intervieweefeedback: feedback?.feedback,
-            voiceTone: feedback?.videoAnalysis?.voiceTone ?? "",
-            bodyLanguage: feedback?.videoAnalysis?.bodyLanguage ?? "",
-            facialExpressions: feedback?.videoAnalysis?.facialExpressions ?? "",
-            confidence: feedback?.videoAnalysis?.confidence ?? "",
-            speakingPace: feedback?.videoAnalysis?.speakingPace ?? "",
-            overallPresentation: feedback?.videoAnalysis?.overallPresentation ?? "",
-            improvementSuggestions: feedback?.videoAnalysis?.improvementSuggestions ?? "",
-            videoUrl,
-            userAnswer,
-            correctAnswer: answer,
-
-          }
-        }
-      )
-      return NextResponse.json({ message: 'Answer updated successfully.' }, { status: 200 });
-    } else {
-      const newMockAns = await db.userAnswer.create({
-        data: {
-          question,
-          Intervieweerating: feedback.rating,
-          Intervieweefeedback: feedback.feedback,
-          voiceTone: feedback?.videoAnalysis?.voiceTone ?? "",
-          bodyLanguage: feedback?.videoAnalysis?.bodyLanguage ?? "",
-          facialExpressions: feedback?.videoAnalysis?.facialExpressions ?? "",
-          confidence: feedback?.videoAnalysis?.confidence ?? "",
-          speakingPace: feedback?.videoAnalysis?.speakingPace ?? "",
-          overallPresentation: feedback?.videoAnalysis?.overallPresentation ?? "",
-          improvementSuggestions: feedback?.videoAnalysis?.improvementSuggestions ?? "",
-          videoUrl,
-          userAnswer,
-          userId,
-          correctAnswer: answer,
-          mockInterviewId: mockInterviewId.toString()
-        }
+      await db.userAnswer.update({
+        where: {
+          id: existingAnswer.id,
+        },
+        data: answerData,
       });
 
-
-      return NextResponse.json({ message: 'Mock Answer created successfully', newMockAns });
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Answer updated successfully",
+        },
+        { status: 200 }
+      );
     }
-  } catch (error: any) {
-    console.error('Error saving mock interview answer:', error.message || error);
-    return NextResponse.json({ error: 'Error saving mock interview answer' }, { status: 500 });
+
+    const newAnswer = await db.userAnswer.create({
+      data: {
+        question,
+        userId,
+        mockInterviewId: mockInterviewId.toString(),
+
+        ...answerData,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Answer saved successfully",
+        data: newAnswer,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error(
+      "Error saving mock interview answer:",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal Server Error",
+      },
+      { status: 500 }
+    );
   }
 }
