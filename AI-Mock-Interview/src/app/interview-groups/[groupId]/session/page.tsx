@@ -103,8 +103,8 @@ export default function InterviewSessionPage({ params }: SessionPageProps) {
     submittedUsers,
     interviewComplete
   } = useInterviewStore();
-  const unwrappedParams = use(params);
-  const { groupId } = unwrappedParams;
+
+  const { groupId } = params;
 
   // Fetch initial session data and connect to WebSocket
   useEffect(() => {

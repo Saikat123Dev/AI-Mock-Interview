@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current user
-    const user = await currentUser();
+    const { userId } = await auth();
 
-    if (!user?.id) {
+    if (!userId) {
       return NextResponse.json(
         {
           error: "User not authenticated",
@@ -47,12 +47,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userId = user.id;
-
     // Convert rating string ("4/5", "0/5") => number
-    const rating = feedback?.rating
+    let parsedRating = feedback?.rating
       ? parseInt(feedback.rating.toString().split("/")[0], 10)
       : 0;
+
+    if (isNaN(parsedRating)) {
+      parsedRating = 0;
+    }
+
+    const rating = parsedRating;
 
     // Check if answer already exists
     const existingAnswer = await db.userAnswer.findFirst({
@@ -62,27 +66,29 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const safeString = (val: any) => {
+      if (val === null || val === undefined) return "";
+      if (typeof val === 'string') return val;
+      return JSON.stringify(val);
+    };
+
     const answerData = {
       Intervieweerating: rating,
-      Intervieweefeedback: feedback?.feedback || "",
+      Intervieweefeedback: safeString(feedback?.feedback),
 
-      voiceTone: feedback?.videoAnalysis?.voiceTone ?? "",
-      bodyLanguage: feedback?.videoAnalysis?.bodyLanguage ?? "",
-      facialExpressions:
-        feedback?.videoAnalysis?.facialExpressions ?? "",
-      confidence: feedback?.videoAnalysis?.confidence ?? "",
-      speakingPace: feedback?.videoAnalysis?.speakingPace ?? "",
-      overallPresentation:
-        feedback?.videoAnalysis?.overallPresentation ?? "",
-      improvementSuggestions:
-        feedback?.videoAnalysis?.improvementSuggestions ?? "",
+      voiceTone: safeString(feedback?.videoAnalysis?.voiceTone),
+      bodyLanguage: safeString(feedback?.videoAnalysis?.bodyLanguage),
+      facialExpressions: safeString(feedback?.videoAnalysis?.facialExpressions),
+      confidence: safeString(feedback?.videoAnalysis?.confidence),
+      speakingPace: safeString(feedback?.videoAnalysis?.speakingPace),
+      overallPresentation: safeString(feedback?.videoAnalysis?.overallPresentation),
+      improvementSuggestions: safeString(feedback?.videoAnalysis?.improvementSuggestions),
 
       videoUrl: videoUrl ?? "",
 
       userAnswer,
 
-      correctAnswer:
-        feedback?.correctAnswer || answer || "",
+      correctAnswer: safeString(feedback?.correctAnswer) || answer || "",
     };
 
     if (existingAnswer) {

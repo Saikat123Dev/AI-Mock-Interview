@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { currentUser } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 
@@ -9,8 +9,8 @@ const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
 export async function POST(req: Request) {
   try {
     // Get the current user
-    const user = await currentUser();
-    if (!user) {
+    const { userId } = await auth();
+    if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     const interviewGroupUser = await db.interviewGroupUser.findUnique({
       where: {
         userId_groupId: {
-          userId: user.id,
+          userId: userId,
           groupId: question.groupId
         }
       }
@@ -165,7 +165,7 @@ export async function POST(req: Request) {
       data: {
         questionId,
         participantId: interviewGroupUser.id,
-        userId: user.id,
+        userId: userId,
         text: userAnswer,
         score: analysis.score,
         feedback: analysis.feedback

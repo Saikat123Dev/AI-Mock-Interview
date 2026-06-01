@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await currentUser ();
-    if (!user) {
+    const { userId } = await auth ();
+    if (!userId) {
 
       return NextResponse.json(
         { error: 'Unauthorized. Please log in.' },
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         difficultyLevel,
         interviewerImageId,
         MockResponse:MockResponse.interviewQuestions,
-        userId: user.id,
+        userId: userId,
       },
     });
     console.log("akash maity love",newMockInterview);

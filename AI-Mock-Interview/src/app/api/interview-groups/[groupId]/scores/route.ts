@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { currentUser } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -8,8 +8,8 @@ export async function GET(
 ) {
   try {
     // Get the current user
-    const user = await currentUser();
-    if (!user) {
+    const { userId } = await auth();
+    if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -19,7 +19,7 @@ export async function GET(
     const interviewGroupUser = await db.interviewGroupUser.findUnique({
       where: {
         userId_groupId: {
-          userId: user.id,
+          userId: userId,
           groupId: groupId
         }
       }

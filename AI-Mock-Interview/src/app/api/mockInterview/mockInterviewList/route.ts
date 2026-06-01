@@ -1,11 +1,11 @@
 import { db } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request:NextRequest){
-    const user=await currentUser();
-    console.log("user:",user);
-    const userid=user?.id;
+    const { userId } = await auth();
+    console.log("user:",userId);
+    const userid=userId;
     try{
         const fetchAllInterviews=await db.mockInterview.findMany({
             where:{
